@@ -1,0 +1,22 @@
+{
+  "name": "ud_co2_viewer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^1.4.0",
+    "bootstrap": "^5.3.1",
+    "chart.js": "^4.3.3"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.4.0",
+    "typescript": "^4.8.2",
+    "vite": "^4.2.1"
+  }
+}
