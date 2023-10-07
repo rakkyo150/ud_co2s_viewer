@@ -129,6 +129,7 @@ fn main() {
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 if event.window().label() == "main"{
                     event.window().hide().unwrap();
+                    api.prevent_close();
                 }
                 else{
                     event.window().close().unwrap();
