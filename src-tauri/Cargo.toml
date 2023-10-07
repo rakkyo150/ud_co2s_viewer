@@ -3,7 +3,7 @@ name = "ud_co2s_viewer"
 version = "1.0.2"
 description = "UD-CO2S-Viewer"
 authors = ["you"]
-license = ""
+license = "MIT"
 repository = ""
 edition = "2021"
 

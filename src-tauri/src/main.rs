@@ -79,8 +79,10 @@ fn toggle_window_visible(window: &tauri::Window) {
 fn main() {
     let hide = CustomMenuItem::new("show or hide".to_string(), "Show or Hide");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    let license = CustomMenuItem::new("license".to_string(), "License");
     let tray_menu = SystemTrayMenu::new()
         .add_item(hide)
+        .add_item(license)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
     let system_tray = SystemTray::new().with_menu(tray_menu);
@@ -116,6 +118,22 @@ fn main() {
                         let window = app.get_window("main").unwrap();
                         toggle_window_visible(&window);
                         window.set_focus().unwrap();
+                    }
+                    "license" => {
+                        let license = match app.get_window("license") {
+                            Some(license) => license,
+                            None => {
+                                let license = tauri::WindowBuilder::new(
+                                    app,
+                                    "license",
+                                    tauri::WindowUrl::App("license.html".into())
+                                ).build().unwrap();
+                                let _ = license.set_title("License");
+                                license
+                            }
+                        };
+                        license.show().unwrap();
+                        license.set_focus().unwrap();
                     }
                     _ => {}
                 }
