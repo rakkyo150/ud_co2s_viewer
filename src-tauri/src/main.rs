@@ -3,7 +3,7 @@
 
 use std::{io::{self, Write}, fs};
 use reqwest::blocking::get;
-use tauri::{CustomMenuItem,SystemTrayMenu,SystemTrayMenuItem,SystemTray,Manager};
+use tauri::{CustomMenuItem,SystemTrayMenu,SystemTrayMenuItem,SystemTray,Manager, AppHandle};
 use tauri_plugin_positioner::{WindowExt, Position};
 
 pub fn start_logging(address: &str) -> io::Result<i32> {
@@ -61,19 +61,49 @@ fn ppm(address: &str) -> String {
     }
 }
 
-fn toggle_window_visible(window: &tauri::Window) {
-    match window.is_visible() {
-        Ok(visible) => {
-            if visible {
-                window.hide().unwrap();
-            } else {
-                window.show().unwrap();
+fn show_window(window: &AppHandle, label: &str) {
+    let label_window = match window.get_window(label) {
+        Some(label_window) => label_window,
+        None => {
+            let label_window = tauri::WindowBuilder::new(
+                window,
+                label,
+                tauri::WindowUrl::App(format!("{}.html", label).into())
+            ).build().unwrap();
+            let _ = label_window.set_title(label);
+            label_window
+        }
+    };
+    label_window.set_focus().unwrap();
+}
+
+fn show_or_hide_main_window(window: &AppHandle) {
+    let label = "main";
+    match window.get_window(label) {
+        Some(label_window) => {
+            match label_window.is_visible() {
+                Ok(visible) => {
+                    if visible {
+                        label_window.hide().unwrap();
+                    } else {
+                        label_window.show().unwrap();
+                    }
+                }
+                Err(err) => {
+                    panic!("failed toggle visible for main window {}", err);
+                }
             }
+        },
+        None => {
+            let label_window = tauri::WindowBuilder::new(
+                window,
+                label,
+                tauri::WindowUrl::App("index.html".into())
+            ).build().unwrap();
+            let _ = label_window.set_title("ud_co2s_viewer");
+            label_window.set_focus().unwrap();
         }
-        Err(err) => {
-            panic!("failed toggle visible for main window {}", err);
-        }
-    }
+    };
 }
 
 fn main() {
@@ -97,17 +127,18 @@ fn main() {
         })
         .on_window_event(|event| match event.event() {
             tauri::WindowEvent::CloseRequested { api, .. } => {
-                event.window().hide().unwrap();
-                api.prevent_close();
+                if event.window().label() == "main"{
+                    event.window().hide().unwrap();
+                }
+                else{
+                    event.window().close().unwrap();
+                };
             }
             _ => {}
         })
         .on_system_tray_event(|app, event| match event {
             tauri::SystemTrayEvent::LeftClick { .. } => {
-                let win = app.get_window("main").unwrap();
-                let _ = win.move_window(Position::RightCenter);
-                toggle_window_visible(&win);
-                win.set_focus().unwrap();
+                show_or_hide_main_window(app);
             }
             tauri::SystemTrayEvent::MenuItemClick { id, .. } => {
                 match id.as_str() {
@@ -115,25 +146,10 @@ fn main() {
                         app.exit(0);
                     }
                     "show or hide" => {
-                        let window = app.get_window("main").unwrap();
-                        toggle_window_visible(&window);
-                        window.set_focus().unwrap();
+                        show_or_hide_main_window(app);
                     }
                     "license" => {
-                        let license = match app.get_window("license") {
-                            Some(license) => license,
-                            None => {
-                                let license = tauri::WindowBuilder::new(
-                                    app,
-                                    "license",
-                                    tauri::WindowUrl::App("license.html".into())
-                                ).build().unwrap();
-                                let _ = license.set_title("License");
-                                license
-                            }
-                        };
-                        license.show().unwrap();
-                        license.set_focus().unwrap();
+                        show_window(app, "license");
                     }
                     _ => {}
                 }
