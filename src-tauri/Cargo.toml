@@ -1,6 +1,6 @@
 [package]
 name = "ud_co2s_viewer"
-version = "1.1.0"
+version = "1.1.1"
 description = "UD-CO2S-Viewer"
 authors = ["you"]
 license = "MIT"
