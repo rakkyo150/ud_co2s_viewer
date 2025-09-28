@@ -2,33 +2,30 @@
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist",
-    "withGlobalTauri": true
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
   },
-  "package": {
-    "productName": "ud_co2s_viewer",
-    "version": "1.1.3"
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
   },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      }
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.rakkyo150.ud-co2-viewer",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
+  "productName": "ud_co2s_viewer",
+  "mainBinaryName": "ud_co2s_viewer",
+  "version": "1.1.3",
+  "identifier": "com.rakkyo150.ud-co2-viewer",
+  "plugins": {},
+  "app": {
+    "withGlobalTauri": true,
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
     },
     "security": {
       "csp": null
@@ -39,12 +36,9 @@
         "resizable": true,
         "title": "ud_co2s_viewer",
         "width": 300,
-        "height": 350
+        "height": 350,
+        "useHttpsScheme": true
       }
-    ],
-    "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true
-    }
+    ]
   }
 }

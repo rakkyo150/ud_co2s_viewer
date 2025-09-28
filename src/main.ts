@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 import Chart, { ChartOptions } from 'chart.js/auto';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { appDataDir } from '@tauri-apps/api/path';

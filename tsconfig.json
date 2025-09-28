@@ -1,18 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "composite": true,
+    "skipLibCheck": true,
     "module": "ESNext",
-    "lib": ["ESNext", "DOM"],
-    "moduleResolution": "Node",
-    "strict": true,
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "types": ["vite/client"],
-    "noEmit": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["./src"]
+  "include": ["vite.config.ts"]
 }
