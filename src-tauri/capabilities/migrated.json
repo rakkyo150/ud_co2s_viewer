@@ -8,6 +8,9 @@
   "permissions": [
     "core:default",
     "shell:allow-open",
-    "shell:default"
+    "shell:default",
+    "fs:default",
+    "fs:allow-appconfig-read-recursive",
+    "fs:allow-appconfig-write-recursive"
   ]
 }

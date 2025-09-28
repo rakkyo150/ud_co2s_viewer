@@ -1,8 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import Chart, { ChartOptions } from 'chart.js/auto';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { appDataDir } from '@tauri-apps/api/path';
-import { path } from "@tauri-apps/api";
+import { readTextFile, writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
 
 let address_data_file = "address_data.txt";
 
@@ -14,44 +13,40 @@ let chart: HTMLCanvasElement | null;
 let chart2: any;
 let address: string | null = "";
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
   inputAddress = document.querySelector("#input-address");
   appropriateAddress = document.querySelector("#appropriate-address");
   addressForm = document.querySelector("#address-form");
-  addressForm?.addEventListener("submit", (e) => {
+  addressForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    set_address();
+    await set_address();
   });
   nowPpm = document.querySelector("#now-ppm");
   chart = document.querySelector("#chart");
+
+  try{
+    const result = await readTextFile(address_data_file, {baseDir: BaseDirectory.AppConfig})
   
-  appDataDir().then((result)=>{
-    path.join(result, address_data_file).then((result)=>{
-      address_data_file = result;
-      invoke("read_file", { path: address_data_file }).then((result) => {
-        if (result != null) {
-          address = result as string;
-        }
+    if (result != null) {
+      address = result as string;
+    }
 
-        make_chart().then((result) => {
-          change_display(result);
-        }).catch((error) => {
-          console.log(error);
-        });
-      
-        setInterval(async () => {
-          if (addressForm!.style.display=="block" && appropriateAddress!.style.display=="none") return;
-          let result = await make_chart()
-          change_display(result);
-        }, 5000);
+    try{
+      const chart_result = await make_chart();
+      change_display(chart_result);
+    }
+    catch(error) {
+      console.log(error);
+    };
 
-      }).catch((error) => {
-        console.error(error);
-      });
-    }).catch((error)=>{
-      console.error(error);
-    });
-  });
+    setInterval(async () => {
+      if (addressForm!.style.display=="block" && appropriateAddress!.style.display=="none") return;
+      let result = await make_chart()
+      change_display(result);
+    }, 5000);
+  }catch(error) {
+    console.error(error);
+  };
 });
 
 function change_display(result: boolean) {
@@ -66,16 +61,19 @@ function change_display(result: boolean) {
 }
 
 async function set_address() {
-  if (addressForm!.style.display=="block" && inputAddress!.value!=null) {
+  if (addressForm!.style.display!="block" || inputAddress!.value==null) return;
+  
+  try{
     address = inputAddress!.value;
-    invoke("write_file", { path: address_data_file, contents: address }).then((result) => {
-      console.log(result);
-    }).catch((error) => {
-      console.error(error);
+    await writeTextFile(address_data_file, address,{
+      baseDir: BaseDirectory.AppConfig,
     });
-    let result = await make_chart()
-    change_display(result);
   }
+  catch(error){
+    console.error(error);
+  };
+  let result = await make_chart()
+  change_display(result);
 }
 
 async function make_chart(): Promise<boolean>{
